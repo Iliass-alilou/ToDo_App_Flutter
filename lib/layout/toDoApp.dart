@@ -42,7 +42,7 @@ class ToDo_App extends StatelessWidget {
                 ToDoApp_Cubit.get(context).title_appBar[ToDoApp_Cubit.get(context).currentIndex],    //[currentIndex],
               ),
             ),
-            body:ToDoApp_Cubit.get(context).Newtasks.length==0 ? Center(child: CircularProgressIndicator()) : ToDoApp_Cubit.get(context).screens[ToDoApp_Cubit.get(context).currentIndex],
+            body:/*ToDoApp_Cubit.get(context).Newtasks.length==0 ? Center(child: CircularProgressIndicator()) :*/ ToDoApp_Cubit.get(context).screens[ToDoApp_Cubit.get(context).currentIndex],
             floatingActionButton: Padding(
               padding: const EdgeInsets.only(
                 bottom: 40.0,

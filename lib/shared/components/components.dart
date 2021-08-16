@@ -137,7 +137,7 @@ Widget ItemTaskBuilder (Map tasks , context) => Dismissible(
                   id: tasks['id']
               );
             },
-            icon: Icon(
+            icon: tasks['status'] == 'done'  ? Icon(null) : Icon(
               Icons.check_box_rounded,
               color: Colors.green,
             )
@@ -150,7 +150,7 @@ Widget ItemTaskBuilder (Map tasks , context) => Dismissible(
                   id: tasks['id']
               );
             },
-            icon: Icon(
+            icon: tasks['status'] == 'archived'  ? Icon(null) : Icon(
               Icons.archive,
               color: Colors.grey,
             )

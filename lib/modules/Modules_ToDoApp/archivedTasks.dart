@@ -18,20 +18,34 @@ class Archived_Tasks extends StatelessWidget {
         builder: ( context , state)
         {
           var tasks = ToDoApp_Cubit.get(context).Archivedtasks;
-          return ListView.separated(
-            itemBuilder: (context , index ) => ItemTaskBuilder(tasks[index] ,context ),
-            separatorBuilder: (context , index ) => Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0
-              ),
-              child: Container(
-                width: double.infinity,
-                height: 2.0,
-                color: Colors.grey[300],
-              ),
-            ),
-            itemCount: tasks.length,
-          ) ;
+          return tasks.length == 0
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.menu,
+                      ),
+                      Text(
+                        'You don\'t have any Archived task yet',
+                        style: TextStyle(fontSize: 20.0),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.separated(
+                  itemBuilder: (context, index) =>
+                      ItemTaskBuilder(tasks[index], context),
+                  separatorBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Container(
+                      width: double.infinity,
+                      height: 2.0,
+                      color: Colors.grey[300],
+                    ),
+                  ),
+                  itemCount: tasks.length,
+                );
         }
     );
   }
