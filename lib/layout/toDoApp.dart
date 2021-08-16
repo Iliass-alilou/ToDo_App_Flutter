@@ -12,8 +12,6 @@ class ToDo_App extends StatelessWidget {
 
   var scaffolKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  bool BottomSheet_Shown = false;
-  IconData floatIcon = Icons.edit;
   var titleController = TextEditingController();
   var timeController = TextEditingController();
   var dayController = TextEditingController();
@@ -30,7 +28,10 @@ class ToDo_App extends StatelessWidget {
       create: (BuildContext contex)=> ToDoApp_Cubit()..createDatabase(),
       child: BlocConsumer<ToDoApp_Cubit,ToDoApp_States>(
         listener: ( context , state){
-
+          if(state is InsertIntoDataBaseState)
+          {
+            Navigator.pop(context);
+          }
         },
         builder: (context , state ){
           return Scaffold(
@@ -41,7 +42,7 @@ class ToDo_App extends StatelessWidget {
                 ToDoApp_Cubit.get(context).title_appBar[ToDoApp_Cubit.get(context).currentIndex],    //[currentIndex],
               ),
             ),
-            body:tasks.length==0 ? Center(child: CircularProgressIndicator()) : ToDoApp_Cubit.get(context).screens[ToDoApp_Cubit.get(context).currentIndex],
+            body:ToDoApp_Cubit.get(context).Newtasks.length==0 ? Center(child: CircularProgressIndicator()) : ToDoApp_Cubit.get(context).screens[ToDoApp_Cubit.get(context).currentIndex],
             floatingActionButton: Padding(
               padding: const EdgeInsets.only(
                 bottom: 40.0,
@@ -49,8 +50,14 @@ class ToDo_App extends StatelessWidget {
               child: FloatingActionButton(
                 onPressed: ()
                 {
-                  if(BottomSheet_Shown){
+                  if(ToDoApp_Cubit.get(context).BottomSheet_Shown){
                     if(formKey.currentState!.validate()){
+                      ToDoApp_Cubit.get(context).insertIntoDatabase(
+                          title: titleController.text,
+                          time: timeController.text,
+                          day: dayController.text,
+                      );
+
                       // insertIntoDatabase(
                       //   title: titleController.text,
                       //   time: timeController.text,
@@ -161,26 +168,25 @@ class ToDo_App extends StatelessWidget {
                                         });
                                       },
                                     ),
-
                                   ],
                                 ),
                               ),
                             ),
                           ) ;
                         }).closed.then((value){
-                      BottomSheet_Shown = false;
-                      // setState(() {
-                      //   floatIcon = Icons.edit;
-                      // });
+                      ToDoApp_Cubit.get(context).BottomSheet_Show_Close(
+                          isBottomSheet_shown: false,
+                          icon: Icons.edit,
+                      );
                     });
-                    BottomSheet_Shown = true;
-                    // setState(() {
-                    //   floatIcon = Icons.add;
-                    // });
+                    ToDoApp_Cubit.get(context).BottomSheet_Show_Close(
+                      isBottomSheet_shown: true,
+                      icon: Icons.add,
+                    );
                   }
                 },
                 child: Icon(
-                  floatIcon,
+                  ToDoApp_Cubit.get(context).floatIcon,
                 ),
               ),
             ),

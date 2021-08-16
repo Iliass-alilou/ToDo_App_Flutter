@@ -6,7 +6,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:todo_app/modules/Modules_ToDoApp/archivedTasks.dart';
 import 'package:todo_app/modules/Modules_ToDoApp/doneTasks.dart';
 import 'package:todo_app/modules/Modules_ToDoApp/newTasks.dart';
-import 'package:todo_app/shared/components/constants.dart';
 import 'package:todo_app/shared/cubit/states.dart';
 
 class ToDoApp_Cubit extends Cubit <ToDoApp_States>{
@@ -14,6 +13,10 @@ class ToDoApp_Cubit extends Cubit <ToDoApp_States>{
   ToDoApp_Cubit() : super(ToDoApp_InitialState());
 
   static ToDoApp_Cubit get(context) => BlocProvider.of(context);
+
+  List<Map> Newtasks = [];
+  List<Map> Donetasks = [];
+  List<Map> Archivedtasks = [];
 
   late Database database ;
   int currentIndex = 0;
@@ -50,30 +53,31 @@ class ToDoApp_Cubit extends Cubit <ToDoApp_States>{
         },
         onOpen: (database)
         {
-          // getFromDataBase(database).then((value)
-          // {
-          //   tasks = value;
-          //   print(tasks);
-          // });
-          print("database opned");
+          getFromDataBase(database);
+          print("database opened");
         }
     ).then((value) {
       database = value;
-      emit(CreateDataBaseState());
+
     });
 
   }
 
-  Future insertIntoDatabase ({
+   insertIntoDatabase ({
     required String title,
     required String time,
     required String day,
   }) async{
-    return await database.transaction((txn) async
+    await database.transaction((txn) async
     {
-      txn.rawInsert('INSERT INTO tasks (title, time, day , status)VALUES("$title","$time","$day" ,"new Task")').then((value)
+      txn.rawInsert(
+          'INSERT INTO tasks (title, time, day , status)VALUES("$title","$time","$day" ,"new Task")'
+      ).then((value)
       {
         print ("$value inserted successfully ");
+        emit(InsertIntoDataBaseState());
+
+        getFromDataBase(database);
       }).catchError((error)
       {
         print("error when when iserting ${error.toString()}");
@@ -83,9 +87,65 @@ class ToDoApp_Cubit extends Cubit <ToDoApp_States>{
 
   }
 
-  Future<List<Map>> getFromDataBase (database) async
+   void upDateDataBase ({
+     required String status,
+     required int id
+   }) async
+   {
+       database.rawUpdate(
+         'UPDATE tasks SET status = ? WHERE id = ?',
+         ['$status', '$id']).then((value){
+           getFromDataBase(database);
+           emit(UpdateDataBaseState());
+       });
+
+   }
+
+  void deleteDataBase ({
+    required int id
+  }) async
   {
-    return await database.rawQuery('SELECT * FROM tasks');
+    database
+        .rawDelete('DELETE FROM tasks WHERE id = ?',
+        ['$id']).then((value){
+          getFromDataBase(database);
+          emit(UpDeleteDataBaseState());
+    });
+  }
+
+
+
+ void getFromDataBase (database)
+  {
+    Newtasks = [];
+    Donetasks = [];
+    Archivedtasks = [];
+    database.rawQuery('SELECT * FROM tasks').then((value)
+    {
+      value.forEach((element) {
+        if(element['status'] == 'new Task')
+        {
+          Newtasks.add(element);
+        }
+        else if (element['status'] == 'done'){
+          Donetasks.add(element);
+        }
+        else Archivedtasks.add(element);
+      });
+      emit(GetDataBaseState());
+    });
+  }
+  bool BottomSheet_Shown = false;
+  IconData floatIcon = Icons.edit;
+
+  void BottomSheet_Show_Close ({
+    required bool isBottomSheet_shown,
+    required IconData icon
+  })
+  {
+    BottomSheet_Shown = isBottomSheet_shown;
+    floatIcon = icon;
+    emit(BotoomSheetShowState());
   }
 
 }

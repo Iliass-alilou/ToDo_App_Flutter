@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/shared/cubit/cubit.dart';
 
 Widget LoginButton ({
   double width = double.infinity,
@@ -81,46 +82,83 @@ Widget defaultFormField ({
 
 );
 
-Widget ItemTaskBuilder (Map tasks) => Padding(
-  padding: const EdgeInsets.all(20.0),
-  child: Row(
-    children: [
-      CircleAvatar(
-        radius: 40.0,
-        child: Text(
-          '${tasks['time']}',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 17.0,
-            fontWeight: FontWeight.bold,
+Widget ItemTaskBuilder (Map tasks , context) => Dismissible(
+  key: Key(tasks['id'].toString()),
+  child:   Padding(
+    padding: const EdgeInsets.all(20.0),
+    child: Row(
+      children: [
+        CircleAvatar(
+          radius: 40.0,
+          child: Text(
+            '${tasks['time']}',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 17.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
-      SizedBox(
-        width: 30.0,
-      ),
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment:CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${tasks['title']}',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
+        SizedBox(
+          width: 30.0,
+        ),
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment:CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${tasks['title']}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              Text(
+                '${tasks['day']}',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15.0,
+                ),
+              ),
+            ],
           ),
-          Text(
-            '${tasks['day']}',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-              fontSize: 15.0,
-            ),
-          ),
-        ],
-      ),
-    ],
+        ),
+        SizedBox(
+          width: 30.0,
+        ),
+        IconButton(
+            onPressed: ()
+            {
+              ToDoApp_Cubit.get(context).upDateDataBase(
+                  status: 'done',
+                  id: tasks['id']
+              );
+            },
+            icon: Icon(
+              Icons.check_box_rounded,
+              color: Colors.green,
+            )
+        ),
+        IconButton(
+            onPressed: ()
+            {
+              ToDoApp_Cubit.get(context).upDateDataBase(
+                  status: 'archived',
+                  id: tasks['id']
+              );
+            },
+            icon: Icon(
+              Icons.archive,
+              color: Colors.grey,
+            )
+        ),
+      ],
+    ),
   ),
+  onDismissed: (direction){
+    ToDoApp_Cubit.get(context).deleteDataBase(id: tasks['id']);
+  },
 );
